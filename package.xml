@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>runners</name>
+  <version>0.0.0</version>
+  <description>The runners package</description>
+
+  <maintainer email="stevendaniluk8@gmail.com">Steven Daniluk</maintainer>
+  <license>BSD</license>
+  <author email="stevendaniluk8@gmail.com">Steven Daniluk</author>
+  
+  <!-- Build Tool Dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <!-- Build Dependencies -->
+  <build_depend>roscpp</build_depend>
+  
+  <!-- Run Time Dependencies -->
+  <run_depend>roscpp</run_depend>
+  
+</package>

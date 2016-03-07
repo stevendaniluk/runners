@@ -16,19 +16,12 @@ int main(int argc, char** argv){
     return 1;
   }// end if
   
-  ROS_INFO("I'm ALIIIVVEEEEE!!!");
+  ROS_INFO("Beginning test");
   
   // Create Runner object
   Runner test;
   
   test.showPose();
-    
-  // Output id
-  ROS_INFO("Runner id is: %d", test.id);
-  // Change id
-  test.setId(3);
-  // Output new id
-  ROS_INFO("Runner id is: %d", test.id);
   
   // Assign input arguments to goal object
   test.setCurrentGoal(atof(argv[1]), atof(argv[2]), atof(argv[3]));
@@ -42,6 +35,8 @@ int main(int argc, char** argv){
   test.sendGoal(test.current_goal);
   
   test.showPose();
+  
+  test.dock();
   
   return 0;
 }

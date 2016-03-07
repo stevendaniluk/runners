@@ -4,27 +4,19 @@
 
 //---------------------------------------------------------------------------
 
-Runner::Runner() : ac("move_base", true) {
+Runner::Runner() : move_base_ac("move_base", true), docking_ac("dock_drive_action", true) {
   
   // Wait for action server
-  while(!ac.waitForServer(ros::Duration(5.0))){
-    ROS_INFO("Waiting for the move_base action server to come up");
+  while(!move_base_ac.waitForServer(ros::Duration(5.0)) || 
+        !docking_ac.waitForServer(ros::Duration(5.0))) {
+    ROS_INFO("Waiting for action servers to come up");
   }// end while
-  
-  // Set instance ID
-  setId(1);
+
   
   // Subscribe to pose
   pose_sub = nh.subscribe("amcl_pose", 100, &Runner::amcl_pose_callback, this);
   
 }// end constructor
-
-//-----------------------------------------
-
-// setId member function
-void Runner::setId(int id_in) {
- id=id_in;
-}// end setId
 
 //-----------------------------------------
 
@@ -45,20 +37,23 @@ void Runner::sendGoal(move_base_msgs::MoveBaseGoal &goal) {
   // Timestamp
   goal.target_pose.header.stamp = ros::Time::now();
   
-  // Send the goal and wait
+  // Send the goal
   ROS_INFO("Sending goal.");
-  ac.sendGoal(goal);
-  ac.waitForResult();
+  move_base_ac.sendGoal(goal);
   
-  // Check if successful
-  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+  // Monitor status
+  while (!move_base_ac.waitForResult(ros::Duration(3))) {
+    nav_state = move_base_ac.getState();
+    ROS_INFO("Navigation status: %s",nav_state.toString().c_str());
+    
+    // Check if successful
+    if(nav_state == actionlib::SimpleClientGoalState::SUCCEEDED){
       ROS_INFO("Goal reached successfully.");
-      //return true;
     }else {
       ROS_INFO("Navigation to goal failed.");
-      //return false;
     }// end if
-
+    
+  }// end while
 }// end sendGoal
 
 //-----------------------------------------
@@ -85,6 +80,33 @@ void Runner::showPose() {
           pose.pose.pose.position.y, pose.pose.pose.orientation.z);
 
 }// end showPose
+
+//-----------------------------------------
+
+// Start auto docking
+void Runner::dock() {
+  
+  // Send the goal
+  ROS_INFO("Begin docking.");
+  docking_ac.sendGoal(dock_goal);
+  
+  time = ros::Time::now();
+  
+  // Monitor status
+  while (!docking_ac.waitForResult(ros::Duration(3))) {
+    dock_state = docking_ac.getState();
+    ROS_INFO("Docking status: %s",dock_state.toString().c_str());
+    
+    if (ros::Time::now() > (time+ros::Duration(30))) {
+      ROS_INFO("Docking took more than 30 seconds, canceling.");
+      docking_ac.cancelGoal();
+      break;
+    }// end if
+  }// end while
+}// end dock
+
+
+
 
 
 

@@ -25,9 +25,11 @@ include_directories(
 
 # Declare C++ executables
 add_executable(main src/main.cpp)
+add_executable(go_home_apartment src/go_home_apartment.cpp)
 
 # Specify link libraries
 target_link_libraries(main ${catkin_LIBRARIES} runner)
+target_link_libraries(go_home_apartment ${catkin_LIBRARIES} runner)
 
 # Declare a C++ library
 add_library(runner src/runner/runner.cpp)

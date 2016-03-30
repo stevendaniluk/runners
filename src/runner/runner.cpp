@@ -4,17 +4,37 @@
 
 //---------------------------------------------------------------------------
 
-Runner::Runner() : move_base_ac("move_base", true), docking_ac("dock_drive_action", true) {
-  
-  // Wait for action server
-  while(!move_base_ac.waitForServer(ros::Duration(5.0)) || 
-        !docking_ac.waitForServer(ros::Duration(5.0))) {
-    ROS_INFO("Waiting for action servers to come up");
-  }// end while
+Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "test"), 
+                   docking_state(actionlib::SimpleClientGoalState::LOST, "test"),
+                   move_base_ac("move_base", true), 
+                   docking_ac("dock_drive_action", true) {
 
-  
   // Subscribe to pose
   pose_sub = nh.subscribe("amcl_pose", 100, &Runner::amcl_pose_callback, this);
+  
+  // Wait for action servers (do individually in case docking is not used)
+  ROS_INFO("Waiting for action servers to come up");
+  int loop_counter=0;
+  
+  while(!move_base_ac.waitForServer(ros::Duration(1.0))) {
+    if (loop_counter >= 3) {
+      ROS_INFO("The move_base action server did not successfully come up");
+      break;
+    }// end if
+    loop_counter++;
+  }// end while
+  
+  loop_counter=0;
+  while(!docking_ac.waitForServer(ros::Duration(1.0))) {
+    if (loop_counter >= 3) {
+      ROS_INFO("The docking action server did not successfully come up");
+      break;
+    }// end if
+    loop_counter++;
+  }// end while
+  
+  // Get current pose
+  getPose();
   
 }// end constructor
 
@@ -26,7 +46,7 @@ void Runner::setCurrentGoal(float x_in, float y_in, float theta_in) {
   current_goal.target_pose.pose.position.y=y_in;
   current_goal.target_pose.pose.orientation.z=theta_in*(3.14159265/180);
   current_goal.target_pose.pose.orientation.w = 1.0;
-  current_goal.target_pose.header.frame_id = "base_link";
+  current_goal.target_pose.header.frame_id = "map";
 }// end setCurrentGoal
 
 //-----------------------------------------
@@ -45,40 +65,38 @@ void Runner::sendGoal(move_base_msgs::MoveBaseGoal &goal) {
   while (!move_base_ac.waitForResult(ros::Duration(3))) {
     nav_state = move_base_ac.getState();
     ROS_INFO("Navigation status: %s",nav_state.toString().c_str());
-    
-    // Check if successful
-    if(nav_state == actionlib::SimpleClientGoalState::SUCCEEDED){
-      ROS_INFO("Goal reached successfully.");
-    }else {
-      ROS_INFO("Navigation to goal failed.");
-    }// end if
-    
   }// end while
+  
+  nav_state = move_base_ac.getState();
+  // Check if successful
+  if(nav_state == actionlib::SimpleClientGoalState::SUCCEEDED){
+    ROS_INFO("Goal reached successfully.");
+  }else {
+    ROS_INFO("Navigation to goal failed.");
+  }// end if
+  
 }// end sendGoal
 
 //-----------------------------------------
 
 // Callback for pose subscriber
 void Runner::amcl_pose_callback(const geometry_msgs::PoseWithCovarianceStamped & pose_cb){
-  pose.pose.pose.position.x = pose_cb.pose.pose.position.x;
-  pose.pose.pose.position.y = pose_cb.pose.pose.position.y;
-  pose.pose.pose.orientation.z = pose_cb.pose.pose.orientation.z*(180/3.14159265);
-
+  pose=pose_cb;
 }// end pose callback
 
 //-----------------------------------------
 
-// Spinner
-void Runner::spin() {
+// Get pose
+void Runner::getPose() {
   ros::spinOnce();
-}// end spin
+}// end showPose
 
-// Show pose
-void Runner::showPose() {
+//-----------------------------------------
+
+// Set start pose
+void Runner::setStartPose() {
   ros::spinOnce();
-  ROS_INFO("Current pose: x=%f, y=%f, theta=%f\n", pose.pose.pose.position.x,
-          pose.pose.pose.position.y, pose.pose.pose.orientation.z);
-
+  start_pose=pose;
 }// end showPose
 
 //-----------------------------------------
@@ -94,8 +112,8 @@ void Runner::dock() {
   
   // Monitor status
   while (!docking_ac.waitForResult(ros::Duration(3))) {
-    dock_state = docking_ac.getState();
-    ROS_INFO("Docking status: %s",dock_state.toString().c_str());
+    docking_state = docking_ac.getState();
+    ROS_INFO("Docking status: %s",docking_state.toString().c_str());
     
     if (ros::Time::now() > (time+ros::Duration(30))) {
       ROS_INFO("Docking took more than 30 seconds, canceling.");
@@ -104,10 +122,4 @@ void Runner::dock() {
     }// end if
   }// end while
 }// end dock
-
-
-
-
-
-
 

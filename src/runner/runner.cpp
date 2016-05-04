@@ -12,6 +12,12 @@ Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "test"),
   // Subscribe to pose
   pose_sub = nh.subscribe("amcl_pose", 100, &Runner::amcl_pose_callback, this);
   
+  // Subscribe to odom
+  odom_sub = nh.subscribe("odom", 100, &Runner::odom_pose_callback, this);
+  
+  // Initialize costmap client
+  costmap_client = nh.serviceClient<std_srvs::Empty>("/move_base/clear_costmaps");
+  
   // Wait for action servers (do individually in case docking is not used)
   ROS_INFO("Waiting for action servers to come up");
   int loop_counter=0;
@@ -33,19 +39,19 @@ Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "test"),
     loop_counter++;
   }// end while
   
-  // Get current pose
-  getPose();
+  // Update
+  update();
   
 }// end constructor
 
 //-----------------------------------------
 
 // Assign a goal
-void Runner::setCurrentGoal(float x_in, float y_in, float theta_in) {
+void Runner::setCurrentGoal(float x_in, float y_in, float theta_in, float w_in) {
   current_goal.target_pose.pose.position.x=x_in;
   current_goal.target_pose.pose.position.y=y_in;
-  current_goal.target_pose.pose.orientation.z=theta_in*(3.14159265/180);
-  current_goal.target_pose.pose.orientation.w = 1.0;
+  current_goal.target_pose.pose.orientation.z=theta_in;
+  current_goal.target_pose.pose.orientation.w = w_in;
   current_goal.target_pose.header.frame_id = "map";
 }// end setCurrentGoal
 
@@ -79,6 +85,29 @@ void Runner::sendGoal(move_base_msgs::MoveBaseGoal &goal) {
 
 //-----------------------------------------
 
+// Send a temporary goal
+void Runner::sendTempGoal(move_base_msgs::MoveBaseGoal &goal) {
+
+  // Timestamp
+  goal.target_pose.header.stamp = ros::Time::now();
+  
+  // Send the goal
+  move_base_ac.sendGoal(goal);
+  
+  // Update the state
+  nav_state = move_base_ac.getState();
+  
+}// end sendGoal
+
+//-----------------------------------------
+
+// Update nav_state
+void Runner::updateNavState() {
+  nav_state = move_base_ac.getState();
+}// end sendGoal
+
+//-----------------------------------------
+
 // Callback for pose subscriber
 void Runner::amcl_pose_callback(const geometry_msgs::PoseWithCovarianceStamped & pose_cb){
   pose=pose_cb;
@@ -86,8 +115,15 @@ void Runner::amcl_pose_callback(const geometry_msgs::PoseWithCovarianceStamped &
 
 //-----------------------------------------
 
-// Get pose
-void Runner::getPose() {
+// Callback for odom subscriber
+void Runner::odom_pose_callback(const nav_msgs::Odometry & odom_cb){
+  odom=odom_cb;
+}// end pose callback
+
+//-----------------------------------------
+
+// Update the callbacks
+void Runner::update() {
   ros::spinOnce();
 }// end showPose
 
@@ -121,5 +157,19 @@ void Runner::dock() {
       break;
     }// end if
   }// end while
+  docking_state = docking_ac.getState();
 }// end dock
+
+//-----------------------------------------
+
+// Clear costmap
+void Runner::clearCostmap() {
+  
+  bool success = costmap_client.call(costmap_srv);
+  if (success) {
+    ROS_INFO("Costmap cleared.");
+  }else {
+    ROS_INFO("Clearing costmap failed.");
+  }// end if
+}
 

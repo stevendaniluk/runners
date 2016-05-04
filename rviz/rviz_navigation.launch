@@ -1,0 +1,13 @@
+<!-- Test script for RVIZ  -->
+
+<launch>
+  
+  <!-- Start RVIZ -->
+  <node 
+    name="rviz" 
+    pkg="rviz" 
+    type="rviz" 
+    args="-d $(find runners)/rviz/navigation.rviz"
+  />
+  
+</launch>

@@ -5,8 +5,11 @@ project(runners)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
   actionlib
+  base_local_planner
+  pcl_ros
+  roscpp
+  roslib
 )
 
 # Declare the catkin package
@@ -33,5 +36,10 @@ target_link_libraries(go_home_apartment ${catkin_LIBRARIES} runner)
 
 # Declare a C++ library
 add_library(runner src/runner/runner.cpp)
+add_library(runners_planner_lib src/runners_planner/runners_planner.cpp)
+
 # Specify link libraries
 target_link_libraries(runner ${catkin_LIBRARIES})
+target_link_libraries(runners_planner_lib ${catkin_LIBRARIES})
+
+

@@ -2,7 +2,7 @@
 <package>
   <name>runners</name>
   <version>0.0.0</version>
-  <description>The runners package</description>
+  <description>The Runners package</description>
 
   <maintainer email="stevendaniluk8@gmail.com">Steven Daniluk</maintainer>
   <license>BSD</license>
@@ -12,9 +12,27 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   <!-- Build Dependencies -->
+  <build_depend>angles</build_depend>
+  <build_depend>base_local_planner</build_depend>
+  <build_depend>costmap_2d</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>nav_core</build_depend>
+  <build_depend>nav_msgs</build_depend> 
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>pluginlib</build_depend>
   <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>tf</build_depend>
   
   <!-- Run Time Dependencies -->
+  <run_depend>base_local_planner</run_depend>
+  <run_depend>nav_core</run_depend>
   <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>tf</run_depend>
+  
+  <export>
+    <nav_core plugin="${prefix}/misc/runners_planner_plugin.xml" />
+  </export>
   
 </package>

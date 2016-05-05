@@ -8,9 +8,11 @@
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <std_srvs/Empty.h>
+
 #include <kobuki_msgs/AutoDockingAction.h>
 #include <kobuki_msgs/AutoDockingGoal.h>
-#include <std_srvs/Empty.h>
+#include "kobuki_msgs/SensorState.h"
 
 //---------------------------------------------------------------------------
 
@@ -18,8 +20,10 @@ class Runner {
 
   public:
     
-    // Member decleration
-    int id;	// Instance id
+    // Kobuki battery
+    double batt_voltage;
+    bool charging;    
+    bool full_charge;
     
     // Goal details
     move_base_msgs::MoveBaseGoal current_goal;
@@ -47,9 +51,7 @@ class Runner {
     
     // Send a goal
     void sendGoal(move_base_msgs::MoveBaseGoal &goal);
-    
-    // Send a temporary goal
-    void sendTempGoal(move_base_msgs::MoveBaseGoal &goal);
+    void sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal);
     
     // Update the callbacks
     void update();
@@ -84,16 +86,20 @@ class Runner {
     std_srvs::Empty costmap_srv;
     
     // Subscribers
-    ros::Subscriber pose_sub;
-    ros::Subscriber odom_sub;
+    ros::Subscriber pose_sub;		// Pose from AMCL
+    ros::Subscriber odom_sub;		// From base
+    ros::Subscriber sensors_sub;	// From kobuki sensors/core
     
     //-----------------------------------------
     
     // Callback for pose subscriber
-    void amcl_pose_callback(const geometry_msgs::PoseWithCovarianceStamped &pose);
+    void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &pose_cb);
     
     // Callback for odom subscriber
-    void odom_pose_callback(const nav_msgs::Odometry &odom);
+    void odomPoseCallback(const nav_msgs::Odometry &odom_cb);
+    
+    // Callback for battery subscriber
+    void sensorsCallback(const kobuki_msgs::SensorState &sensors_cb);
     
 };// end Runner class definition
 

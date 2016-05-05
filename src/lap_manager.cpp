@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
   runner.setCurrentGoal(0.0, 0.0, 0.0, 1.0);
   
   // Start navigating
-  runner.sendGoal(runner.current_goal);
+  runner.sendGoal(runner.current_goal_);
   
   // Lets loop at 1 Hz
   ros::Rate loop_rate(0.5);
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   while (ros::ok()) {
     runner.update();
     
-    ROS_INFO("Voltage: %.2f", runner.batt_voltage);
+    ROS_INFO("Voltage: %.2f", runner.batt_voltage_);
     
     loop_rate.sleep();
   }// end while

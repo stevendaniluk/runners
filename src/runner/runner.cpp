@@ -4,28 +4,28 @@
 
 //---------------------------------------------------------------------------
 
-Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "nav_state"), 
-                   docking_state(actionlib::SimpleClientGoalState::LOST, "docking_state"),
-                   move_base_ac("move_base", true), 
-                   docking_ac("dock_drive_action", true) {
+Runner::Runner() : nav_state_(actionlib::SimpleClientGoalState::LOST, "nav_state"), 
+                   docking_state_(actionlib::SimpleClientGoalState::LOST, "docking_state"),
+                   move_base_ac_("move_base", true), 
+                   docking_ac_("dock_drive_action", true) {
 
   // Subscribe to pose
-  pose_sub = nh.subscribe("amcl_pose", 100, &Runner::amclPoseCallback, this);
+  pose_sub_ = nh.subscribe("amcl_pose", 100, &Runner::amclPoseCallback, this);
   
   // Subscribe to odom
-  odom_sub = nh.subscribe("odom", 100, &Runner::odomPoseCallback, this);
+  odom_sub_ = nh.subscribe("odom", 100, &Runner::odomPoseCallback, this);
   
   // Subscribe to kobuki sensors
-  sensors_sub = nh.subscribe("mobile_base/sensors/core", 1, &Runner::sensorsCallback, this);
+  sensors_sub_ = nh.subscribe("mobile_base/sensors/core", 1, &Runner::sensorsCallback, this);
   
   // Initialize costmap client
-  costmap_client = nh.serviceClient<std_srvs::Empty>("/move_base/clear_costmaps");
+  costmap_client_ = nh.serviceClient<std_srvs::Empty>("/move_base/clear_costmaps");
   
   // Wait for action servers (do individually in case docking is not used)
   ROS_INFO("Waiting for action servers to come up");
   int loop_counter=0;
   
-  while(!move_base_ac.waitForServer(ros::Duration(1.0))) {
+  while(!move_base_ac_.waitForServer(ros::Duration(1.0))) {
     if (loop_counter >= 3) {
       ROS_INFO("The move_base action server did not successfully come up");
       break;
@@ -34,7 +34,7 @@ Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "nav_state"
   }// end while
   
   loop_counter=0;
-  while(!docking_ac.waitForServer(ros::Duration(1.0))) {
+  while(!docking_ac_.waitForServer(ros::Duration(1.0))) {
     if (loop_counter >= 3) {
       ROS_INFO("The docking action server did not successfully come up");
       break;
@@ -51,11 +51,11 @@ Runner::Runner() : nav_state(actionlib::SimpleClientGoalState::LOST, "nav_state"
 
 // Assign a goal
 void Runner::setCurrentGoal(float x_in, float y_in, float theta_in, float w_in) {
-  current_goal.target_pose.pose.position.x=x_in;
-  current_goal.target_pose.pose.position.y=y_in;
-  current_goal.target_pose.pose.orientation.z=theta_in;
-  current_goal.target_pose.pose.orientation.w = w_in;
-  current_goal.target_pose.header.frame_id = "map";
+  current_goal_.target_pose.pose.position.x=x_in;
+  current_goal_.target_pose.pose.position.y=y_in;
+  current_goal_.target_pose.pose.orientation.z=theta_in;
+  current_goal_.target_pose.pose.orientation.w = w_in;
+  current_goal_.target_pose.header.frame_id = "map";
 }// end setCurrentGoal
 
 //-----------------------------------------
@@ -68,7 +68,7 @@ void Runner::sendGoal(move_base_msgs::MoveBaseGoal &goal) {
   
   // Send the goal
   ROS_INFO("Sending goal.");
-  move_base_ac.sendGoal(goal);
+  move_base_ac_.sendGoal(goal);
   
 }// end sendGoal
 
@@ -82,17 +82,17 @@ void Runner::sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal) {
   
   // Send the goal
   ROS_INFO("Sending goal.");
-  move_base_ac.sendGoal(goal);
+  move_base_ac_.sendGoal(goal);
   
   // Monitor status
-  while (!move_base_ac.waitForResult(ros::Duration(3))) {
-    nav_state = move_base_ac.getState();
-    ROS_INFO("Navigation status: %s",nav_state.toString().c_str());
+  while (!move_base_ac_.waitForResult(ros::Duration(3))) {
+    nav_state_ = move_base_ac_.getState();
+    ROS_INFO("Navigation status: %s",nav_state_.toString().c_str());
   }// end while
   
-  nav_state = move_base_ac.getState();
+  nav_state_ = move_base_ac_.getState();
   // Check if successful
-  if(nav_state == actionlib::SimpleClientGoalState::SUCCEEDED){
+  if(nav_state_ == actionlib::SimpleClientGoalState::SUCCEEDED){
     ROS_INFO("Goal reached successfully.");
   }else {
     ROS_INFO("Navigation to goal failed.");
@@ -102,9 +102,9 @@ void Runner::sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal) {
 
 //-----------------------------------------
 
-// Update nav_state
+// Update navigation state
 void Runner::updateNavState() {
-  nav_state = move_base_ac.getState();
+  nav_state_ = move_base_ac_.getState();
 }// end sendGoal
 
 //-----------------------------------------
@@ -112,7 +112,7 @@ void Runner::updateNavState() {
 // Set start pose
 void Runner::setStartPose() {
   ros::spinOnce();
-  start_pose=pose;
+  start_pose_ = pose_;
 }// end showPose
 
 //-----------------------------------------
@@ -122,22 +122,22 @@ void Runner::dock() {
   
   // Send the goal
   ROS_INFO("Begin docking.");
-  docking_ac.sendGoal(dock_goal);
+  docking_ac_.sendGoal(dock_goal_);
   
-  time = ros::Time::now();
+  time_ = ros::Time::now();
   
   // Monitor status
-  while (!docking_ac.waitForResult(ros::Duration(3))) {
-    docking_state = docking_ac.getState();
-    ROS_INFO("Docking status: %s",docking_state.toString().c_str());
+  while (!docking_ac_.waitForResult(ros::Duration(3))) {
+    docking_state_ = docking_ac_.getState();
+    ROS_INFO("Docking status: %s",docking_state_.toString().c_str());
     
-    if (ros::Time::now() > (time+ros::Duration(30))) {
+    if (ros::Time::now() > (time_+ros::Duration(30))) {
       ROS_INFO("Docking took more than 30 seconds, canceling.");
-      docking_ac.cancelGoal();
+      docking_ac_.cancelGoal();
       break;
     }// end if
   }// end while
-  docking_state = docking_ac.getState();
+  docking_state_ = docking_ac_.getState();
 }// end dock
 
 //-----------------------------------------
@@ -145,7 +145,7 @@ void Runner::dock() {
 // Clear costmap
 void Runner::clearCostmap() {
   
-  bool success = costmap_client.call(costmap_srv);
+  bool success = costmap_client_.call(costmap_srv_);
   if (success) {
     ROS_INFO("Costmap cleared.");
   }else {
@@ -164,14 +164,14 @@ void Runner::update() {
 
 // Callback for pose subscriber
 void Runner::amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped & pose_cb){
-  pose=pose_cb;
+  pose_ = pose_cb;
 }// end pose callback
 
 //-----------------------------------------
 
 // Callback for odom subscriber
 void Runner::odomPoseCallback(const nav_msgs::Odometry & odom_cb){
-  odom=odom_cb;
+  odom_ = odom_cb;
 }// end odom callback
 
 //-----------------------------------------
@@ -179,21 +179,21 @@ void Runner::odomPoseCallback(const nav_msgs::Odometry & odom_cb){
 // Callback for sensors
 void Runner::sensorsCallback(const kobuki_msgs::SensorState & sensors_cb) {
   // Get the voltage
-  batt_voltage = double(sensors_cb.battery);
-  batt_voltage = batt_voltage/10;
+  batt_voltage_ = double(sensors_cb.battery);
+  batt_voltage_ = batt_voltage_/10;
   
   // Set if we are charging
   if (sensors_cb.charger != 0) {
-    charging = true;
+    charging_ = true;
   }else {
-    charging = false;
+    charging_ = false;
   }// end if
   
   // Set if we are fully charged
   if (sensors_cb.charger == 2 || sensors_cb.charger == 18) {
-    full_charge = true;
+    full_charge_ = true;
   }else {
-    full_charge = false;
+    full_charge_ = false;
   }// end if
 }// end sensors callback
 

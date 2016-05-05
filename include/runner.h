@@ -21,25 +21,23 @@ class Runner {
   public:
     
     // Kobuki battery
-    double batt_voltage;
-    bool charging;    
-    bool full_charge;
+    double batt_voltage_;
+    bool charging_;    
+    bool full_charge_;
     
     // Goal details
-    move_base_msgs::MoveBaseGoal current_goal;
-    actionlib::SimpleClientGoalState nav_state;
+    move_base_msgs::MoveBaseGoal current_goal_;
+    actionlib::SimpleClientGoalState nav_state_;
     
     // Pose details
-    geometry_msgs::PoseWithCovarianceStamped pose;
-    geometry_msgs::PoseWithCovarianceStamped start_pose;
+    geometry_msgs::PoseWithCovarianceStamped pose_;
+    geometry_msgs::PoseWithCovarianceStamped start_pose_;
     
     // Odom details
-    nav_msgs::Odometry odom;
-    nav_msgs::Odometry last_known_odom;
+    nav_msgs::Odometry odom_;
     
     // Docking details
-    actionlib::SimpleClientGoalState docking_state;
-    bool docked;
+    actionlib::SimpleClientGoalState docking_state_;
 
     //-----------------------------------------
     
@@ -74,21 +72,21 @@ class Runner {
     ros::NodeHandle nh;
  
     // Member decleration
-    ros::Time time;
-    kobuki_msgs::AutoDockingGoal dock_goal;
+    ros::Time time_;
+    kobuki_msgs::AutoDockingGoal dock_goal_;
     
     // Create action clients
-    actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> move_base_ac;
-    actionlib::SimpleActionClient<kobuki_msgs::AutoDockingAction> docking_ac;
+    actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> move_base_ac_;
+    actionlib::SimpleActionClient<kobuki_msgs::AutoDockingAction> docking_ac_;
     
     // Create service clients
-    ros::ServiceClient costmap_client;
-    std_srvs::Empty costmap_srv;
+    ros::ServiceClient costmap_client_;
+    std_srvs::Empty costmap_srv_;
     
     // Subscribers
-    ros::Subscriber pose_sub;		// Pose from AMCL
-    ros::Subscriber odom_sub;		// From base
-    ros::Subscriber sensors_sub;	// From kobuki sensors/core
+    ros::Subscriber pose_sub_;		// Pose from AMCL
+    ros::Subscriber odom_sub_;		// From base
+    ros::Subscriber sensors_sub_;	// From kobuki sensors/core
     
     //-----------------------------------------
     

@@ -53,22 +53,32 @@ Runner::Runner() : nav_state_(actionlib::SimpleClientGoalState::LOST, "nav_state
 //-----------------------------------------
 
 // Assign a goal
-void Runner::setActionGoal(double x_in, double y_in, double theta_in, double w_in) {
-  action_goal_.target_pose.pose.position.x=x_in;
-  action_goal_.target_pose.pose.position.y=y_in;
-  action_goal_.target_pose.pose.orientation.z=theta_in;
-  action_goal_.target_pose.pose.orientation.w = w_in;
+void Runner::setActionGoal(double x_in, double y_in, double yaw_in) {
+  action_goal_.target_pose.pose.position.x = x_in;
+  action_goal_.target_pose.pose.position.y = y_in;
+  
+  tf::Quaternion yaw_quat = tf::createQuaternionFromYaw(yaw_in);
+  action_goal_.target_pose.pose.orientation.x = yaw_quat.x();
+  action_goal_.target_pose.pose.orientation.y = yaw_quat.y();
+  action_goal_.target_pose.pose.orientation.z = yaw_quat.z();
+  action_goal_.target_pose.pose.orientation.w = yaw_quat.w();
+
   action_goal_.target_pose.header.frame_id = "map";
 }// end setCurrentGoal
 
 //-----------------------------------------
 
 // Assign a goal
-void Runner::setSimpleGoal(double x_in, double y_in, double theta_in, double w_in) {
-  simple_goal_.pose.position.x=x_in;
-  simple_goal_.pose.position.y=y_in;
-  simple_goal_.pose.orientation.z=theta_in;
-  simple_goal_.pose.orientation.w = w_in;
+void Runner::setSimpleGoal(double x_in, double y_in, double yaw_in) {
+  simple_goal_.pose.position.x = x_in;
+  simple_goal_.pose.position.y = y_in;
+  
+  tf::Quaternion yaw_quat = tf::createQuaternionFromYaw(yaw_in);
+  simple_goal_.pose.orientation.x = yaw_quat.x();
+  simple_goal_.pose.orientation.y = yaw_quat.y();
+  simple_goal_.pose.orientation.z = yaw_quat.z();
+  simple_goal_.pose.orientation.w = yaw_quat.w();
+  
   simple_goal_.header.frame_id = "map";
 }// end setCurrentGoal
 

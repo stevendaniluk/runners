@@ -9,10 +9,11 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <std_srvs/Empty.h>
+#include <tf/tf.h>
 
 #include <kobuki_msgs/AutoDockingAction.h>
 #include <kobuki_msgs/AutoDockingGoal.h>
-#include "kobuki_msgs/SensorState.h"
+#include <kobuki_msgs/SensorState.h>
 
 //---------------------------------------------------------------------------
 
@@ -46,8 +47,8 @@ class Runner {
     Runner();
     
     // Assign a goal
-    void setSimpleGoal(double x_in, double y_in, double theta_in, double w_in);
-    void setActionGoal(double x_in, double y_in, double theta_in, double w_in);
+    void setSimpleGoal(double x_in, double y_in, double yaw_in);
+    void setActionGoal(double x_in, double y_in, double yaw_in);
     
     // Send a goal
     void sendSimpleGoal();

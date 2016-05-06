@@ -37,16 +37,21 @@ namespace runners_planner {
       costmap_ros_ = costmap_ros;
       costmap_ = costmap_ros_->getCostmap();
 
-      ros::NodeHandle private_nh("~/" + name);
       world_model_ = new base_local_planner::CostmapModel(*costmap_); 
       
+      // Create the executive planner nodehandle in global namespace for params
+      ros::NodeHandle exec_planner_nh("/ExecutivePlanner");
+      
       // Get parameters
-      private_nh.param("pt_spacing", pt_spacing_, 0.01);
-      private_nh.param("planning_distance", planning_distance_, 2.0);
-      if (!private_nh.getParam("path_filename", path_filename_)){
+      exec_planner_nh.param("dock_x", dock_x_, 0.00);
+      exec_planner_nh.param("dock_y", dock_y_, 0.00);
+      exec_planner_nh.param("dock_yaw", dock_yaw_, 0.00);
+      exec_planner_nh.param("pt_spacing", pt_spacing_, 0.01);
+      exec_planner_nh.param("planning_distance", planning_distance_, 2.0);
+      if (!exec_planner_nh.getParam("path_filename", path_filename_)){
         ROS_ERROR("Failed to get param 'path_filename'. A text file with coordinates is necessary for this planner to run.");
       }// end if
-      if (!private_nh.getParam("path_package", path_package_)){
+      if (!exec_planner_nh.getParam("path_package", path_package_)){
         ROS_ERROR("Failed to get param 'path_package'. This is necessary in order to find the path file.");
       }// end if
       
@@ -123,6 +128,12 @@ namespace runners_planner {
     if(!initialized_){
       ROS_ERROR("The planner has not been initialized, please call initialize() to use the planner");
       return false;
+    }// end if
+    
+    // REMOVETHISWHENDONE
+    ROS_INFO("Goal x=%.6f, Goal y=%.6f", goal.pose.position.x, goal.pose.position.y);
+    if (goal.pose.position.x == dock_x_ && goal.pose.position.y == dock_y_) {
+      ROS_INFO("------HERE------");
     }// end if
 
     // Make sure the plan vector is empty

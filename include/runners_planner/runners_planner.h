@@ -69,6 +69,11 @@ namespace runners_planner{
       std::vector<double> path_x_, path_y_;
       int num_pts_;
       
+      // Docking variables
+      double dock_x_;
+      double dock_y_;
+      double dock_yaw_;
+      
       // Parameters
       double pt_spacing_; // How far apart points are spaced in the path text file [m]
       double planning_distance_; // How far ahead to generate the plan [m]

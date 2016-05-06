@@ -111,7 +111,7 @@ void Runner::sendActionGoal() {
     ROS_INFO("Navigation status: %s",nav_state_.toString().c_str());
   }// end while
   
-  nav_state_ = move_base_ac_.getState();
+  updateNavState();
   // Check if successful
   if(nav_state_ == actionlib::SimpleClientGoalState::SUCCEEDED){
     ROS_INFO("Goal reached successfully.");
@@ -126,14 +126,6 @@ void Runner::sendActionGoal() {
 void Runner::updateNavState() {
   nav_state_ = move_base_ac_.getState();
 }// end sendGoal
-
-//-----------------------------------------
-
-// Set start pose
-void Runner::setStartPose() {
-  ros::spinOnce();
-  start_pose_ = pose_;
-}// end showPose
 
 //-----------------------------------------
 
@@ -186,13 +178,6 @@ void Runner::update() {
 void Runner::amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped & pose_cb){
   pose_ = pose_cb;
 }// end pose callback
-
-//-----------------------------------------
-
-// Callback for odom subscriber
-void Runner::odomPoseCallback(const nav_msgs::Odometry & odom_cb){
-  odom_ = odom_cb;
-}// end odom callback
 
 //-----------------------------------------
 

@@ -33,10 +33,6 @@ class Runner {
     
     // Pose details
     geometry_msgs::PoseWithCovarianceStamped pose_;
-    geometry_msgs::PoseWithCovarianceStamped start_pose_;
-    
-    // Odom details
-    nav_msgs::Odometry odom_;
     
     // Docking details
     actionlib::SimpleClientGoalState docking_state_;
@@ -57,14 +53,11 @@ class Runner {
     // Update the callbacks
     void update();
     
-    // Set the start pose
-    void setStartPose();
+    // Update nav_state
+    void updateNavState();
     
     // Start docking
     void dock();
-    
-    // Update nav_state
-    void updateNavState();
     
     // Clear costmap
     void clearCostmap();
@@ -98,10 +91,7 @@ class Runner {
     
     // Callback for pose subscriber
     void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &pose_cb);
-    
-    // Callback for odom subscriber
-    void odomPoseCallback(const nav_msgs::Odometry &odom_cb);
-    
+
     // Callback for battery subscriber
     void sensorsCallback(const kobuki_msgs::SensorState &sensors_cb);
     

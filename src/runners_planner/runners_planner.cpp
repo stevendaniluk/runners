@@ -130,14 +130,18 @@ namespace runners_planner {
       return false;
     }// end if
     
-    // REMOVETHISWHENDONE
-    ROS_INFO("Goal x=%.6f, Goal y=%.6f", goal.pose.position.x, goal.pose.position.y);
-    if (goal.pose.position.x == dock_x_ && goal.pose.position.y == dock_y_) {
-      ROS_INFO("------HERE------");
-    }// end if
-
     // Make sure the plan vector is empty
     plan.clear();
+    
+    // First, handle whether we are going to the dock or not
+    if (goal.pose.position.x == dock_x_ && goal.pose.position.y == dock_y_) {
+      // Go to the dock
+      ROS_DEBUG("Goal set to docking location.");
+      
+      plan.push_back(start);
+      plan.push_back(goal);
+      return (true);
+    }// end if
     
     // Check if goal and costmap frame ID's match
     if(goal.header.frame_id != costmap_ros_->getGlobalFrameID()){

@@ -26,7 +26,8 @@ class Runner {
     bool full_charge_;
     
     // Goal details
-    move_base_msgs::MoveBaseGoal current_goal_;
+    geometry_msgs::PoseStamped simple_goal_;
+    move_base_msgs::MoveBaseGoal action_goal_;
     actionlib::SimpleClientGoalState nav_state_;
     
     // Pose details
@@ -45,11 +46,12 @@ class Runner {
     Runner();
     
     // Assign a goal
-    void setCurrentGoal(float x_in, float y_in, float theta_in, float w_in);
+    void setSimpleGoal(double x_in, double y_in, double theta_in, double w_in);
+    void setActionGoal(double x_in, double y_in, double theta_in, double w_in);
     
     // Send a goal
-    void sendGoal(move_base_msgs::MoveBaseGoal &goal);
-    void sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal);
+    void sendSimpleGoal();
+    void sendActionGoal();
     
     // Update the callbacks
     void update();
@@ -87,6 +89,9 @@ class Runner {
     ros::Subscriber pose_sub_;		// Pose from AMCL
     ros::Subscriber odom_sub_;		// From base
     ros::Subscriber sensors_sub_;	// From kobuki sensors/core
+    
+    // Publishers
+    ros::Publisher goal_pub_;		// For simple goals
     
     //-----------------------------------------
     

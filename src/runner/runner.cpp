@@ -18,6 +18,9 @@ Runner::Runner() : nav_state_(actionlib::SimpleClientGoalState::LOST, "nav_state
   // Subscribe to kobuki sensors
   sensors_sub_ = nh.subscribe("mobile_base/sensors/core", 1, &Runner::sensorsCallback, this);
   
+  // Form publisher to simple goals
+  goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal", 1);
+  
   // Initialize costmap client
   costmap_client_ = nh.serviceClient<std_srvs::Empty>("/move_base/clear_costmaps");
   
@@ -50,39 +53,47 @@ Runner::Runner() : nav_state_(actionlib::SimpleClientGoalState::LOST, "nav_state
 //-----------------------------------------
 
 // Assign a goal
-void Runner::setCurrentGoal(float x_in, float y_in, float theta_in, float w_in) {
-  current_goal_.target_pose.pose.position.x=x_in;
-  current_goal_.target_pose.pose.position.y=y_in;
-  current_goal_.target_pose.pose.orientation.z=theta_in;
-  current_goal_.target_pose.pose.orientation.w = w_in;
-  current_goal_.target_pose.header.frame_id = "map";
+void Runner::setActionGoal(double x_in, double y_in, double theta_in, double w_in) {
+  action_goal_.target_pose.pose.position.x=x_in;
+  action_goal_.target_pose.pose.position.y=y_in;
+  action_goal_.target_pose.pose.orientation.z=theta_in;
+  action_goal_.target_pose.pose.orientation.w = w_in;
+  action_goal_.target_pose.header.frame_id = "map";
 }// end setCurrentGoal
 
 //-----------------------------------------
 
-// Send a goal
-void Runner::sendGoal(move_base_msgs::MoveBaseGoal &goal) {
+// Assign a goal
+void Runner::setSimpleGoal(double x_in, double y_in, double theta_in, double w_in) {
+  simple_goal_.pose.position.x=x_in;
+  simple_goal_.pose.position.y=y_in;
+  simple_goal_.pose.orientation.z=theta_in;
+  simple_goal_.pose.orientation.w = w_in;
+  simple_goal_.header.frame_id = "map";
+}// end setCurrentGoal
 
+//-----------------------------------------
+
+// Send the current goal (without monitoring progress)
+void Runner::sendSimpleGoal() {
   // Timestamp
-  goal.target_pose.header.stamp = ros::Time::now();
+  simple_goal_.header.stamp = ros::Time::now();
   
   // Send the goal
   ROS_INFO("Sending goal.");
-  move_base_ac_.sendGoal(goal);
-  
+  goal_pub_.publish(simple_goal_);
 }// end sendGoal
 
 //-----------------------------------------
 
 // Send a goal and wait
-void Runner::sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal) {
-
+void Runner::sendActionGoal() {
   // Timestamp
-  goal.target_pose.header.stamp = ros::Time::now();
+  action_goal_.target_pose.header.stamp = ros::Time::now();
   
   // Send the goal
   ROS_INFO("Sending goal.");
-  move_base_ac_.sendGoal(goal);
+  move_base_ac_.sendGoal(action_goal_);
   
   // Monitor status
   while (!move_base_ac_.waitForResult(ros::Duration(3))) {
@@ -97,7 +108,6 @@ void Runner::sendGoalAndWait(move_base_msgs::MoveBaseGoal &goal) {
   }else {
     ROS_INFO("Navigation to goal failed.");
   }// end if
-  
 }// end sendGoalAndWait
 
 //-----------------------------------------

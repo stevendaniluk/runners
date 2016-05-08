@@ -5,12 +5,12 @@ ExecutivePlanner:
 # Path Settings
   path_filename: paths/sanford_flemming_path.txt    # text file with path coordinates to
   path_package: runners_navigation      # Package containing path text file
-  pt_spacing: 0.01                      # Distance between points in path text file [m]
-  planning_distance: 2.0                # Distance ahead to generate the plan [m]
+  pt_spacing: 0.04                      # Distance between points in path text file [m]
+  planning_distance: 5.0                # Distance ahead to generate the plan [m]
   
 # Docking
   dock_x: 1.1
   dock_y: 2.2
-  dock_yaw: 1.23
-  dock_proximity: 0.75
+  dock_yaw: -1.3
+  dock_proximity: 2.0
 

@@ -103,9 +103,6 @@ int main(int argc, char **argv) {
   while (ros::ok()) {
     runner.update();
     
-    // REMOVETHISWHENDONE
-    //runner.batt_low_ = true;  // Hack this in to test docking
-    
     if (!runner.docked_) {
       // Write all our data to the text file
       write_data_to_file(data_file, start_time, runner);

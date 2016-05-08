@@ -178,11 +178,11 @@ void Runner::dock() {
 void Runner::undock() {
   
   // Form docking parameters
-  double back_up_dist = 0.5;	// [m]
+  double back_up_dist = 0.3;	// [m]
   double back_up_speed = 0.25;	// [m/s]
   ros::Duration back_up_time (back_up_dist / back_up_speed);
   
-  double rotation_angle = 1.571;	// [rad]
+  double rotation_angle = 3.1416;	// [rad]
   double rotation_speed = 1.0;		// [rad/s]
   ros::Duration rotation_time (rotation_angle / rotation_speed);
   
@@ -193,19 +193,19 @@ void Runner::undock() {
   geometry_msgs::Twist rotation_msg;
   rotation_msg.angular.z = rotation_speed;
   
-  ros::Time time = ros::Time::now();
+  ros::Time start_time = ros::Time::now();
   ros::Rate loop_rate(20);
   
   ROS_INFO("Backing up from dock.");
   
-  while (time < (time + back_up_time)) {
+  while (ros::Time::now() < (start_time + back_up_time)) {
     cmd_vel_pub_.publish(back_up_msg);
     loop_rate.sleep();
   }// end while
   
-  time = ros::Time::now();
+  start_time = ros::Time::now();
   
-  while (time < (time + rotation_time)) {
+  while (ros::Time::now() < (start_time + rotation_time)) {
     cmd_vel_pub_.publish(rotation_msg);
     loop_rate.sleep();
   }// end while

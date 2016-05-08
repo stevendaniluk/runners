@@ -124,6 +124,7 @@ int main(int argc, char **argv) {
           ROS_INFO("Going to try and dock");
           runner.setActionGoal(dock_x, dock_y, dock_yaw);
           runner.sendActionGoal();
+          runner.dock();
         }// end if
       }// end if
       

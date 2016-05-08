@@ -1,0 +1,4 @@
+# gitignore for Runners
+
+# Testing data text files
+testing_data/

@@ -2,13 +2,15 @@
 
 ExecutivePlanner:
 
-# Path settings
-  path_filename: paths/test_path.txt    # Name to text file with path coordinates to loa
-  path_package: runners_navigation      # Package name that the path text file is in
-  pt_spacing: 0.01                      # How far apart points are spaced in the path text file [m]
-  planning_distance: -1.5               # How far ahead to generate the plan [m]
+# Path Settings
+  path_filename: paths/sanford_flemming_path.txt    # text file with path coordinates to
+  path_package: runners_navigation      # Package containing path text file
+  pt_spacing: 0.01                      # Distance between points in path text file [m]
+  planning_distance: 2.0                # Distance ahead to generate the plan [m]
   
 # Docking
   dock_x: 1.1
   dock_y: 2.2
   dock_yaw: 1.23
+  dock_proximity: 0.75
+

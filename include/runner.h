@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <std_srvs/Empty.h>
@@ -21,21 +22,28 @@ class Runner {
 
   public:
     
-    // Kobuki battery
+    // Kobuki
     double batt_voltage_;
+    bool batt_low_;
     bool charging_;    
     bool full_charge_;
+    bool docked_;
     
     // Goal details
     geometry_msgs::PoseStamped simple_goal_;
     move_base_msgs::MoveBaseGoal action_goal_;
     actionlib::SimpleClientGoalState nav_state_;
     
-    // Pose details
-    geometry_msgs::PoseWithCovarianceStamped pose_;
-    
     // Docking details
     actionlib::SimpleClientGoalState docking_state_;
+    
+    // Data monitoring
+    double vel_x_;
+    double vel_theta_;
+    double pos_x_;
+    double pos_y_;
+    double cov_xx_;
+    double cov_yy_;
 
     //-----------------------------------------
     
@@ -59,13 +67,16 @@ class Runner {
     // Start docking
     void dock();
     
+    // Back up from dock
+    void undock();
+    
     // Clear costmap
     void clearCostmap();
     
   private:
   
     // Create nodehandle(s)
-    ros::NodeHandle nh;
+    ros::NodeHandle nh_;
  
     // Member decleration
     ros::Time time_;
@@ -83,17 +94,25 @@ class Runner {
     ros::Subscriber pose_sub_;		// Pose from AMCL
     ros::Subscriber odom_sub_;		// From base
     ros::Subscriber sensors_sub_;	// From kobuki sensors/core
+    ros::Subscriber vel_sub_;		// From mobile base
     
     // Publishers
     ros::Publisher goal_pub_;		// For simple goals
+    ros::Publisher cmd_vel_pub_;	// For sending raw velocity commands
     
     //-----------------------------------------
     
     // Callback for pose subscriber
     void amclPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &pose_cb);
+    
+    // Callback for odom subscriber
+    void odomPoseCallback(const nav_msgs::Odometry &odom_cb);
 
     // Callback for battery subscriber
     void sensorsCallback(const kobuki_msgs::SensorState &sensors_cb);
+    
+    // Callback for velocity subscriber
+    void velocityCallback(const geometry_msgs::Twist &vel_cb);
     
 };// end Runner class definition
 

@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
   runner.setActionGoal(dock_x, dock_y, dock_yaw);
   runner.sendActionGoal();
   
+  runner.dock();
+  
   ros::Duration(3).sleep();
   
   // Backup from the dock

@@ -4,9 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1/Frames1
         - /TF1/Tree1
-      Splitter Ratio: 0.571429
+      Splitter Ratio: 0.531977
     Tree Height: 563
   - Class: rviz/Selection
     Name: Selection
@@ -98,11 +97,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        kinect:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         laser_scan:
           Alpha: 1
           Show Axes: false
@@ -342,7 +336,10 @@ Visualization Manager:
           Marker Topic: /move_base/TebLocalPlannerROS/teb_markers
           Name: Obstacles
           Namespaces:
-            {}
+            LineObstacles: true
+            PointObstacles: true
+            PolyObstacles: true
+            TebContainer: true
           Queue Size: 100
           Value: true
         - Arrow Length: 0.3
@@ -377,7 +374,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -12.575
+      Angle: -12.57
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
@@ -386,11 +383,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 67.3305
-      Target Frame: <Fixed Frame>
+      Scale: 98.6657
+      Target Frame: base_footprint
       Value: TopDownOrtho (rviz)
-      X: 4.28248
-      Y: 4.99976
+      X: 0.0300712
+      Y: 0.20265
     Saved: ~
 Window Geometry:
   Displays:

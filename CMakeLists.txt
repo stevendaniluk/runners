@@ -28,9 +28,13 @@ include_directories(
 
 # Declare C++ executables
 add_executable(lap_manager src/lap_manager.cpp)
+add_executable(dock_test src/dock_test.cpp)
+add_executable(premature_docking_test src/premature_docking_test.cpp)
 
 # Specify link libraries
 target_link_libraries(lap_manager ${catkin_LIBRARIES} runner)
+target_link_libraries(dock_test ${catkin_LIBRARIES} runner)
+target_link_libraries(premature_docking_test ${catkin_LIBRARIES} runner)
 
 # Declare a C++ library
 add_library(runner src/runner/runner.cpp)

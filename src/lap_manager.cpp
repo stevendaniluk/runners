@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
   
   // Initialize
   ros::init(argc, argv, "lap_manager");
-  ros::NodeHandle param_nh("/ExecutivePlanner");
+  ros::NodeHandle param_nh("runners/ExecutivePlanner");
   
   // Variables to load parameters into
   double dock_x;

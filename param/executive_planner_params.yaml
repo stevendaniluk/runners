@@ -9,8 +9,7 @@ ExecutivePlanner:
   planning_distance: 5.0                # Distance ahead to generate the plan [m]
   
 # Docking
-  dock_x: 38.48
-  dock_y: 33.25
-  dock_yaw: 1.2
+  dock_x: 38.45
+  dock_y: 33.30
+  dock_yaw: 1.571
   dock_proximity: 2.0
-

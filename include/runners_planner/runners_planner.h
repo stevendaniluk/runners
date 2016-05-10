@@ -68,6 +68,7 @@ namespace runners_planner{
       // Path file variables
       std::vector<double> path_x_, path_y_;
       int num_pts_;
+      int last_start_index_;
       
       // Docking variables
       double dock_x_;

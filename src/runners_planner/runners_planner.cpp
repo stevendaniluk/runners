@@ -73,7 +73,9 @@ namespace runners_planner {
       for (int i =0 ; i < num_pts_ ; i++){
         path_x_[i] = data[columns*i];
         path_y_[i] = data.at(columns*i+1);
-       }// end for
+      }// end for
+      
+      last_start_index_ = 0;
     
       initialized_ = true;
       
@@ -130,6 +132,13 @@ namespace runners_planner {
       return false;
     }// end if
     
+    // Check if goal and costmap frame ID's match
+    if(goal.header.frame_id != costmap_ros_->getGlobalFrameID()){
+      ROS_ERROR("This planner as configured will only accept goals in the %s frame, but a goal was sent in the %s frame.", 
+          costmap_ros_->getGlobalFrameID().c_str(), goal.header.frame_id.c_str());
+      return false;
+    }// end if
+    
     // Make sure the plan vector is empty
     plan.clear();
     
@@ -141,13 +150,6 @@ namespace runners_planner {
       plan.push_back(start);
       plan.push_back(goal);
       return (true);
-    }// end if
-    
-    // Check if goal and costmap frame ID's match
-    if(goal.header.frame_id != costmap_ros_->getGlobalFrameID()){
-      ROS_ERROR("This planner as configured will only accept goals in the %s frame, but a goal was sent in the %s frame.", 
-          costmap_ros_->getGlobalFrameID().c_str(), goal.header.frame_id.c_str());
-      return false;
     }// end if
     
     ROS_DEBUG("Starting path generation");
@@ -167,7 +169,7 @@ namespace runners_planner {
     int index = 0;
     
     // Check each point
-    for(int i = 0 ; i < num_pts_; i++){
+    for(int i = last_start_index_ ; i < num_pts_; i++){
       dist_x = (start.pose.position.x - path_x_[i]);
       dist_y = (start.pose.position.y - path_y_[i]);
       dist = sqrt(pow(dist_x, 2) + pow(dist_y, 2));
@@ -177,6 +179,9 @@ namespace runners_planner {
         index = i;
       }// end if
     }// end for
+    
+    // Store this for the next plan generation
+    last_start_index_ = index;
     
     ROS_DEBUG("Start point #%d, X=%.3f, Y=%.3f", index + 1, path_x_[index], path_y_[index]);
 

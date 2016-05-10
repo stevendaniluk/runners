@@ -48,18 +48,24 @@ void write_data_to_file (std::ofstream &data_file, double &start_time, Runner &r
 
 int main(int argc, char **argv) {
   
+  bool saving_data;
+  
   // Check input arguments
   if (argc == 1) {
     ROS_WARN("No output data filename given. Will not record data.");
+    saving_data = false;
   }else if (argc != 2) {
     ROS_ERROR("Improper input arguments. Accepts no inputs, or a filename");
+    return 1;
+  }else {
+    saving_data = true;
   }// end if
   
   // Initialize
   ros::init(argc, argv, "lap_manager");
   ros::NodeHandle param_nh("/ExecutivePlanner");
   
-  // Variables to lead parameters into
+  // Variables to load parameters into
   double dock_x;
   double dock_y;
   double dock_yaw;
@@ -71,23 +77,8 @@ int main(int argc, char **argv) {
   param_nh.param("dock_yaw", dock_yaw, 0.00);
   param_nh.param("dock_proximity", dock_proximity, 1.00);
   
-  // Create the filename from the input
-  std::string output_filename = ros::package::getPath("runners") + "/testing_data/"
-                                + argv[1] + ".txt";
-  
-  // Create our output file stream object
-  std::ofstream data_file (output_filename.c_str());
-  if (!data_file.is_open()) {
-    ROS_ERROR("Unable to open data file for writing.");
-  }// end if
-  
-  // Put titles in the data file
-  data_file << "Time \t\tPos X \t\tPos Y \t\tV Lin \t\tV Ang \t\tBatt V";
-
-  // Create our Runner
-  Runner runner;
-  
   // Useful variables
+  std::ofstream data_file;		// File to save data to
   ros::Rate fast_loop_rate(5);          // For while we are running
   ros::Rate slow_loop_rate(0.2);        // For while we are docked
   ros::Time time = ros::Time::now();    // For occasionally outputting data
@@ -95,18 +86,41 @@ int main(int argc, char **argv) {
   double delta_x;			// Relative x position from dock
   double delta_y;			// Relative y position from dock
   
+  if (saving_data) {
+    // Create the filename from the input
+    std::string output_filename = ros::package::getPath("runners") + "/testing_data/"
+                                  + argv[1] + ".txt";
+  
+    // Create our output file stream object
+    std::ofstream data_file (output_filename.c_str());
+    if (!data_file.is_open()) {
+      ROS_ERROR("Unable to open data file for writing.");
+    }// end if
+  
+    // Put titles in the data file
+    data_file << "Time \t\tPos X \t\tPos Y \t\tV Lin \t\tV Ang \t\tBatt V";
+  }// end if
+  
+  // Create our Runner
+  Runner runner;
+  
   // Make fake goal
   runner.setSimpleGoal(0.0, 0.0, 0.0);
   // Send out navigation goal so it stays running
   runner.sendSimpleGoal();
   
+  ROS_INFO("Beginning test.");
+  
   while (ros::ok()) {
     runner.update();
     
     if (!runner.docked_) {
-      // Write all our data to the text file
-      write_data_to_file(data_file, start_time, runner);
-
+      
+      if (saving_data) {
+        // Write all our data to the text file
+        write_data_to_file(data_file, start_time, runner);
+      }// end if
+      
       // Occasionally output our position
       if (ros::Time::now() > (time + ros::Duration(5))) {
         ROS_INFO("Position: X=%.2f, Y=%.2f", runner.pos_x_, runner.pos_y_);
@@ -114,8 +128,8 @@ int main(int argc, char **argv) {
         time = ros::Time::now();
       }// end if
       
-      // If we are low on battery, we'll need to dock and charge
       if (runner.batt_low_) {
+        // Check if we're close to dock
         delta_x = std::abs(runner.pos_x_ - dock_x);
         delta_y = std::abs(runner.pos_y_ - dock_y);
         
@@ -135,9 +149,7 @@ int main(int argc, char **argv) {
       if (runner.full_charge_) {
         // Backup from the dock
         runner.undock();
-        
-        // Make fake goal
-        runner.setSimpleGoal(0.0, 0.0, 0.0);
+
         // Send out navigation goal so it stays running
         runner.sendSimpleGoal();
       }else {
@@ -154,8 +166,10 @@ int main(int argc, char **argv) {
     
   }// end while
   
-  // Close the data file
-  data_file.close();
+  if (saving_data) {
+    // Close the data file
+    data_file.close();
+  }// end if
 
   return 0;
 }// end main

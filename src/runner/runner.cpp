@@ -162,14 +162,14 @@ void Runner::dock() {
     docking_state_ = docking_ac_.getState();
     ROS_INFO("Docking status: %s",docking_state_.toString().c_str());
     
-    if (ros::Time::now() > (time_ + ros::Duration(30))) {
-      ROS_INFO("Docking took more than 30 seconds, canceling.");
+    if (ros::Time::now() > (time_ + ros::Duration(45))) {
+      ROS_INFO("Docking took more than 45 seconds, canceling.");
       docking_ac_.cancelGoal();
       break;
     }// end if
   }// end while
   docking_state_ = docking_ac_.getState();
-  
+  ROS_INFO("Docking status: %s",docking_state_.toString().c_str());
 }// end dock
 
 //-----------------------------------------
@@ -267,7 +267,7 @@ void Runner::sensorsCallback(const kobuki_msgs::SensorState &sensors_cb) {
   
   if (batt_voltage_ < 14.0) {
     batt_low_ = true;
-  }else {
+  }else if (batt_voltage_ > 14.2) {
     batt_low_ = false;
   }// end if
   
@@ -286,7 +286,7 @@ void Runner::sensorsCallback(const kobuki_msgs::SensorState &sensors_cb) {
   }// end if
   
   // Set if we are fully charged
-  if (sensors_cb.charger == 2 || sensors_cb.charger == 18) {
+  if (batt_voltage_ >= 16.2) {
     full_charge_ = true;
   }else {
     full_charge_ = false;

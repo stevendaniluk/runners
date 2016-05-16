@@ -40,7 +40,7 @@ namespace runners_planner {
       world_model_ = new base_local_planner::CostmapModel(*costmap_); 
       
       // Create the executive planner nodehandle in global namespace for params
-      ros::NodeHandle exec_planner_nh("runners/ExecutivePlanner");
+      ros::NodeHandle exec_planner_nh("/runners/ExecutivePlanner");
       
       // Get parameters
       exec_planner_nh.param("dock_x", dock_x_, 0.00);

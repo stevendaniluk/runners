@@ -2,7 +2,7 @@
 
 #include <lap_manager.h>
 
-LapManager::LapManager() : param_nh_("runners/ExecutivePlanner") {
+LapManager::LapManager() : param_nh_("/runners/ExecutivePlanner") {
   
   // Get parameters
   param_nh_.param("dock_x", dock_x_, 0.00);

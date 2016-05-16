@@ -27,17 +27,17 @@ include_directories(
 )
 
 # Declare C++ executables
-add_executable(lap_manager src/lap_manager.cpp)
-
-# Specify link libraries
-target_link_libraries(lap_manager ${catkin_LIBRARIES} runner)
+add_executable(sf_laps src/sf_laps.cpp)
 
 # Declare a C++ library
 add_library(runner src/runner/runner.cpp)
 add_library(runners_planner_lib src/runners_planner/runners_planner.cpp)
+add_library(lap_manager src/lap_manager/lap_manager.cpp)
 
 # Specify link libraries
 target_link_libraries(runner ${catkin_LIBRARIES})
 target_link_libraries(runners_planner_lib ${catkin_LIBRARIES})
+target_link_libraries(lap_manager ${catkin_LIBRARIES})
+target_link_libraries(sf_laps ${catkin_LIBRARIES} runner lap_manager)
 
 

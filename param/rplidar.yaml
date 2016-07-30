@@ -1,0 +1,6 @@
+# Parameters for RPLidar sensor
+# NOT IMPLEMENTED YET
+
+range_max=8.0        #[m]
+range_min=0.1        #[m]
+laser_z_height=0.2   #[m]

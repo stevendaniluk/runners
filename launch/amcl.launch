@@ -1,0 +1,38 @@
+<!-- AMCL Test -->
+
+<launch>
+
+  <!-- Start the RPlidar motor -->
+  <node
+    pkg="runners"
+    type="start_rplidar_motor"
+    name="start_rplidar_motor_node"
+  />
+
+  <!-- Map server -->
+  <arg name="map_name" default="apartment_test.yaml"/>
+  <node 
+    name="map_server" 
+    pkg="map_server" 
+    type="map_server" 
+    args="$(find runners)/maps/$(arg map_name)"
+  />
+  
+  <!-- Set initial position -->
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
+  
+  <!-- Start AMCL -->
+  <include file="$(find runners)/launch/includes/amcl.launch.xml">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include>
+  
+  <!-- Start move_base -->
+  <include file="$(find runners)/launch/includes/move_base.launch.xml">
+  </include>
+
+</launch>
+

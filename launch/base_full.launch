@@ -1,0 +1,14 @@
+<!-- 
+  Full launcher for Runners base
+  Includes: Kobuki and RPLidar
+-->
+
+<launch>
+
+  <include file="$(find runners)/launch/base_minimal.launch"/>
+
+  <include file="$(find runners)/launch/rplidar.launch"/>
+  
+  <include file="$(find kobuki_auto_docking)/launch/standalone.launch"/>
+
+</launch>

@@ -1,0 +1,14 @@
+<!-- GMapping Test -->
+
+<launch>
+
+  <include file="$(find runners)/launch/includes/gmapping.launch.xml"/>
+  
+  <!-- Start the RPlidar motor -->
+  <node
+    pkg="runners_bringup"
+    type="start_rplidar_motor"
+    name="start_rplidar_motor_node"
+  />
+  
+</launch>

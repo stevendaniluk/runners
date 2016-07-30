@@ -4,7 +4,7 @@ ExecutivePlanner:
 
 # Path Settings
   path_filename: paths/sanford_flemming_path.txt    # text file with path coordinates to
-  path_package: runners_navigation      # Package containing path text file
+  path_package: runners                 # Package containing path text file
   pt_spacing: 0.04                      # Distance between points in path text file [m]
   planning_distance: 5.0                # Distance ahead to generate the plan [m]
   

@@ -6,11 +6,11 @@ Enables parameters to be relaunched remotely during testing
 
 <launch>
   <rosparam 
-      file="$(find runners_navigation)/param/teb_local_planner_params.yaml" 
+      file="$(find runners)/param/teb_local_planner_params.yaml" 
       command="load" 
       ns="/move_base" />
     <rosparam 
-      file="$(find runners_navigation)/param/costmap_converter_params.yaml" 
+      file="$(find runners)/param/costmap_converter_params.yaml" 
       command="load"
       ns="/move_base" />
   <rosparam 

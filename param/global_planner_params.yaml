@@ -1,0 +1,19 @@
+# Paremeter settings for GlobalPlanner plugin
+
+GlobalPlanner:
+  allow_unknown: true                       # Create plans that traverse unknown space
+  default_tolerance: 0.0                    # Tolerance on planners goal point
+  visualize_potential: false                # Visualize potential area
+  publish_potential: true                   # Potential costmap
+  use_dijkstra: true                        # Otherwise A*
+  use_quadratic: true                       # Method to approximate potential
+  use_grid_path: false                      # Path follows grid boundaries
+  old_navfn_behavior: false                 # Exactly mirror navfn bahaviour
+  publish_scale: 100                        # Factor to multiply published potential
+  planner_costmap_publish_frequency: 0.0    # default 0.0
+  planner_window_x: 0.0                     # default 0.0
+  planner_window_y: 0.0                     # default 0.0
+  lethal_cost: 253                          # default 253
+  neutral_cost: 50                          # default 50
+  cost_factor: 0.8                          # Factor to multiply cost from costmap
+  

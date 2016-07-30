@@ -1,0 +1,36 @@
+# Runners Common Costmap Parameters
+
+# -----------------------------------------------------------------------------
+
+robot_radius: 0.2
+
+# --------------------------------
+
+obstacle_layer:
+  enabled:              true
+  obstacle_range: 4.0
+  raytrace_range: 5.0
+  #track_unknown_space:  true    #needed for disabling path planning through unknown space
+
+  observation_sources:  rplidar
+  rplidar:
+    data_type: LaserScan
+    topic: scan
+    marking: true
+    clearing: true
+    observation_persistence: 0.0
+    expected_update_rate: 0.5
+
+# --------------------------------
+
+inflation_layer:
+  enabled:              true
+  cost_scaling_factor:  10.0   # exponential rate at which the obstacle cost drops off 
+  inflation_radius:     0.5  # max. distance  which costs are incurred for planning
+
+# --------------------------------
+
+static_layer:
+  enabled:              true
+  map_topic:            "/map"
+

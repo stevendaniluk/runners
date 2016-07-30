@@ -1,0 +1,108 @@
+<!-- Starts amcl node, and sets parameters -->
+
+<!-- Parameters to Tune:
+  -transform_tolerance
+      -Try lowering when running with hardware
+  -update_min_d
+      -See how low it can reasonable go
+  -kld_err
+      -Try lowering to default of 0.01
+  -recovery_alpha_slow/fast
+      -Try activating these to their defualts 0f (0.001 for slow, and 0.1 for fast)
+      and observe the recovery behvaiour
+  -laser_max_beams
+      -Try increasing this and see if it can run at real-time
+  -laser_z_rand
+      -Lower this, since the rplidar should be much more accurate than the kinect
+
+-->
+
+<launch>
+
+  <!-- Initial pose arguments -->
+  <arg name="initial_pose_x"  default="0.0"/>
+  <arg name="initial_pose_y"  default="0.0"/>
+  <arg name="initial_pose_a"  default="0.0"/>
+
+  <node pkg="amcl" type="amcl" name="amcl">
+    
+    <!-- Initial pose parameters -->
+    <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
+    <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
+    <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
+    <!-- Add initial pose covariances -->
+    
+    <!-- Frame ID's -->
+    <param name="odom_frame_id"             value="odom"/> 
+    <param name="base_frame_id"             value="base_link"/> 
+    <param name="global_frame_id"           value="map"/>
+    <!-- missing tf_broadcast -->
+    
+    <!-- Overall filter parameters (excluding initial pose) -->
+    <param name="min_particles"             value="500"/>
+    <param name="max_particles"             value="2000"/>
+    <param name="kld_err"                   value="0.05"/>
+    <param name="kld_z"                     value="0.99"/>
+    <param name="update_min_d"              value="0.10"/>
+    <param name="update_min_a"              value="0.15"/>
+    <param name="resample_interval"         value="1"/>
+    <param name="transform_tolerance"       value="1.0"/>
+    <param name="recovery_alpha_slow"       value="0.0"/>
+    <param name="recovery_alpha_fast"       value="0.0"/>
+    <param name="gui_publish_rate"          value="10.0"/>
+    <!-- missing save_pose_rate -->
+    <param name="use_map_topic"             value="true"/>
+    <!-- missing first_map_only -->
+    
+    <!-- Laser model parameters -->
+    <param name="laser_min_range"           value="0.15"/>
+    <param name="laser_max_range"           value="6.0"/>
+    <param name="laser_max_beams"           value="60"/>
+    <param name="laser_z_hit"               value="0.5"/>   
+    <param name="laser_z_short"             value="0.05"/>
+    <param name="laser_z_max"               value="0.05"/>
+    <param name="laser_z_rand"              value="0.5"/>
+    <param name="laser_sigma_hit"           value="0.2"/>
+    <param name="laser_lambda_short"        value="0.1"/>
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="laser_model_type"          value="likelihood_field"/>
+    
+    <!-- Odometry model parameters -->
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_alpha1"               value="0.2"/>
+    <param name="odom_alpha2"               value="0.2"/>
+    <param name="odom_alpha3"               value="0.2"/>
+    <param name="odom_alpha4"               value="0.2"/>
+    
+  </node>
+</launch>
+
+
+<!-- PARAMETER COMMENTS
+
+Laser parameters z_hit, z_short, z_max, and z_rand control the weighting 
+attributed to each component of the laser model type
+
+Not certain of laer_z_short is still used with the likelihood field model
+
+laser_z_hit
+  -Likelihood of the correct laser measurement
+laser_sigma_hit
+  -Standard deviation of correct laser measurement
+laser_z_short
+  -Likelihood of observing a shorter range (i.e. obstacles)
+laser_lambda_short
+  -Coefficient of exponential (decaying) distribution for observing ranges
+  shorter than what the map predicts
+laser_z_max
+  -Probability of observing a max range measurement (which can 
+  frequently happen when sensing certain surfaces)
+laser_z_rand
+  -Uniform distribution over all measurement values to account for any 
+  unexplained measurements
+laser_likelihood_max_dist
+  -Maximum distance to do obstacle inflation on map (likelihood_field model)
+
+
+
+-->

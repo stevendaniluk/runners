@@ -1,0 +1,7 @@
+To repair the PS3 controller to the dongle do the following:
+
+1) Plug in dongle and PS3 controller
+2) sudo bash
+3) rosrun ps3joy sixpair
+	- If it returns "Unable to retrieve..." run hciconfig hci0 reset
+4) Unplug PS3 controller

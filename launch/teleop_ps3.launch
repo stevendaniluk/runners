@@ -1,0 +1,41 @@
+<!-- 
+	Nodes for using PS3 controller for teleop
+
+Utilizes turtlebot_teleop_joy instead of writing a new controller 
+
+TODO
+****** Re-use Turtlebot source code to implement custom controller ******
+https://github.com/turtlebot/turtlebot/tree/indigo/turtlebot_teleop
+
+-->
+
+<launch>
+  
+  <!--  smooths inputs from cmd_vel_mux/input/teleop_raw to cmd_vel_mux/input/teleop -->
+  <include 
+    file="$(find runners)/launch/includes/velocity_smoother_teleop.launch.xml"
+  /> <!-- End include -->
+
+  <node 
+    pkg="turtlebot_teleop" 
+    type="turtlebot_teleop_joy" 
+    name="turtlebot_teleop_joystick">
+    <param name="scale_angular"        value="1.5"/>
+    <param name="scale_linear"         value="0.5"/>
+    <param name="axis_deadman"         value="10"/>
+    <param name="axis_linear"          value="1"/>
+    <param name="axis_angular"         value="0"/>
+    <remap 
+      from="turtlebot_teleop_joystick/cmd_vel" 
+      to="teleop_velocity_smoother/raw_cmd_vel"
+    />
+  </node> <!-- End teleop node -->
+
+  <node 
+    pkg="joy" 
+    type="joy_node" 
+    name="joystick"
+  /> <!-- End joy node -->
+
+</launch>
+

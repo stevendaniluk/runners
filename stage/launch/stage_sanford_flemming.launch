@@ -1,0 +1,117 @@
+<!-- 
+  Simple Stage simulation for testing
+  
+-->
+<launch>
+  
+  <!-- Map settings -->
+  <arg name="map_name"       default="sanford_flemming.yaml"/>
+  <arg name="world_name"     default="sanford_flemming.world"/>
+  
+  <arg name="initial_pose_x" default="35.52"/>
+  <arg name="initial_pose_y" default="33.52"/>
+  <arg name="initial_pose_a" default="3.1416"/>
+
+  <param name="/use_sim_time" value="true"/>
+  
+  <!--  ******************** Stage ********************  -->
+  <!-- 
+        Publishes transforms:
+          /base_link -> /base_laser
+          /base_footprint -> /base_link (identity)
+          /odom -> base_footprint
+        Publishes topics:
+          /odom : odometry data from the simulated odometry
+          /base_scan : laser data from the simulated laser
+          /base_pose_ground_truth : the ground truth pose
+        Parameters:
+          base_watchdog_timeout: time after receiving the last cmd_vel before stopping
+        Args:
+          -g : run in headless mode.
+  --> 
+  <node 
+    pkg="stage_ros" 
+    type="stageros" 
+    name="stageros"
+    args="-g $(find runners)/stage/maps/stage/$(arg world_name)">
+      <param name="base_watchdog_timeout" value="0.5"/>
+      <remap from="odom" to="odom"/>
+      <remap from="base_pose_ground_truth" to="base_pose_ground_truth"/>
+      <remap from="cmd_vel" to="mobile_base/commands/velocity"/>
+      <remap from="base_scan" to="scan"/>
+  </node>
+
+  <!--  ******************** Robot Model ********************  -->
+
+  <!-- Load URDF file -->
+  <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find runners)/urdf/kobuki.urdf.xacro'" />
+  <param name="robot_description" command="$(arg urdf_file)" />
+
+  <!-- Start state publisher -->
+  <node 
+    pkg="robot_state_publisher" 
+    type="robot_state_publisher" 
+    name="robot_state_publisher" 
+    output="screen">
+    <param 
+      name="publish_frequency" 
+      type="double" 
+      value="5.0" 
+    />
+  </node>
+  
+  <!-- Start joint publisher -->
+  <node 
+    name="joint_state_publisher" 
+    pkg="joint_state_publisher" 
+    type="joint_state_publisher">
+    <param name="use_gui" value="false"/>
+  </node>
+
+  <!-- Start nodelet manager -->
+  <node 
+    pkg="nodelet" 
+    type="nodelet" 
+    name="mobile_base_nodelet_manager" 
+    args="manager"
+  />
+  
+  <!-- Velocity commands multiplexer (required for teleop) -->
+  <node 
+    pkg="nodelet" 
+    type="nodelet" 
+    name="cmd_vel_mux" 
+    args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+    <param 
+      name="yaml_cfg_file" 
+      value="$(find runners)/param/mux.yaml"
+    />
+    <remap 
+      from="cmd_vel_mux/output" 
+      to="mobile_base/commands/velocity"
+    />
+  </node> <!-- end cmd_vel_mux -->
+
+
+  <!--  ************** Navigation  ***************  -->
+  
+  <include file="$(find runners)/launch/includes/move_base.launch.xml"/>
+  
+  <!-- Map server -->
+  <node 
+    name="map_server" 
+    pkg="map_server" 
+    type="map_server" 
+    args="$(find runners)/stage/maps/$(arg map_name)">
+    <param name="frame_id" value="/map"/>
+  </node>
+  
+  <!-- AMCL -->
+  <include file="$(find runners)/launch/includes/amcl.launch.xml">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include>
+
+</launch>
+

@@ -1,0 +1,21 @@
+# Default parameters used by the yocs_velocity_smoother module.
+# Based off of Turtlebot packages
+# Can find parameter info at: http://wiki.ros.org/yocs_velocity_smoother/indigo
+
+# Mandatory parameters
+speed_lim_v: 0.8
+speed_lim_w: 5.4
+
+accel_lim_v: 0.5    # Maximum is  2.0
+accel_lim_w: 2.0
+
+# Optional parameters
+frequency: 20.0    # Output message rate
+decel_factor: 2.5  # Ratio of max deceleration to acceleration
+
+# Robot velocity feedback type:
+# (Current velocity the robot "thinks" it is moving at)
+#  0 - none (default, publish no feedback)
+#  1 - odometry (measure the speed with odometry)
+#  2 - end robot commands (assumes the robot perfectly follows commands)
+robot_feedback: 2

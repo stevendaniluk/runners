@@ -8,6 +8,14 @@ The delivery robot, called a Runner, could navigate indoors and go between rooms
 
 ---
 
+![alt tag](https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Runner.jpeg)
+![alt tag](https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Person.gif)
+
+![alt tag](https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Corner.gif)
+![alt tag](https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Hall.gif)
+
+---
+
 #### Hardware:
 * Kobuki
 * RP Lidar

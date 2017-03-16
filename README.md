@@ -13,11 +13,11 @@ The Runner consisted of a Kobuki base with a body mounted on the top, a compartm
 </p>
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Corner.jpeg">
+	<img src="https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Corner.gif">
 </p>
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Hall.jpeg">
+	<img src="https://raw.githubusercontent.com/stevendaniluk/runners/master/pics/Hall.gif">
 </p>
 
 ---
